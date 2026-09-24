@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import os
+import sys
 import copy
 import base64
 import subprocess
@@ -10,7 +11,24 @@ import io
 import re
 import urllib.request
 from datetime import datetime
-from PIL import Image, ImageDraw, ImageFont
+
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+os.chdir(PROJECT_DIR)
+
+def install_dependencies(packages):
+    for package in packages:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+required_packages = ['requests', 'Pillow']
+
+try:
+    import requests
+    from PIL import Image, ImageDraw, ImageFont
+except ImportError:
+    print("Installing required packages, please wait...")
+    install_dependencies(required_packages)
+    print("Required packages installed successfully. Please relaunch the script.")
+    sys.exit(0)
 
 MODELS_FILE = "matrix_models.json"
 CONTROLS_FILE = "matrix_controls.json"
