@@ -1,15 +1,29 @@
-![Meatsafe Matrix Manager Banner](assets/meatsafe-matrix-manager.jpeg)
+
+   ![meatsafe-matrix-manager](assets/meatsafe-matrix-manager.jpeg) 
+
+<h1 align="center">Meatsafe's Matrix Manager for Draw Things</h1>
+
+<p align="center">
+   <a>An interactive, terminal-based automation tool for the Draw Things macOS app</a><br>
+</p>
+
+This script utilizes the Draw Things Local HTTP API to generate X/Y comparison matrices, allowing you to systematically test different parameters. It automates the entire batch and outputs a neatly organized HTML spreadsheet and a master PNG grid of your results.
 
 
 
-# Meatsafe's Matrix Manager for Draw Things
 
-An interactive, terminal-based automation tool for the Draw Things macOS app. This script utilizes the Draw Things Local HTTP API to generate X/Y comparison matrices, allowing you to systematically test different Models, LoRAs, CFG scales, and step counts. 
+<p align="center"><strong>
+    <a href="#features">Features </a>&bull;
+    <a href="#pro-tips_for_complex_matrices">Tips </a>&bull;
+    <a href="#installation">Installation </a>&bull;
+    <a href="#roadmap--coming-soon">Roadmap </a>&bull;
+    <a href="#support-the-project">Support The Project </a>&bull;
+    <a href="#screenshots">Screenshots </a>&bull;
+    <a href="#example-matrices">Example Matrices </a>
+</strong></p>
 
-Instead of manually swapping models and tweaking settings to find the perfect generation parameters, this manager automates the entire batch and outputs a neatly organized HTML spreadsheet and a master PNG grid of your results.
 
-## See example matrices at the bottom.
-
+<p align="center"><img src="assets/MeatsafeMatrixManagerIcon.png"></p>
 
 ## Features
 * **Axis-Based Matrix Generation:** Choose any two variables to map across the X and Y axes.
@@ -25,20 +39,22 @@ Instead of manually swapping models and tweaking settings to find the perfect ge
 * **Universal vs. Varied LoRAs:** When configuring LoRAs, you have two options. **Varied LoRAs** will map to specific columns/rows on your matrix to compare their effects. **Universal LoRAs** (like a turbo or detailer LoRA) will be applied to *every* generation in the matrix, provided they are compatible with the base model for that specific cell.
 
 
-## Installation for macOS
+## Installation
 
 1. **Download the Repository:**
-   Clone this repository via terminal or click "Code" -> "Download ZIP" and extract it to your preferred location.
+   * Clone this repository via terminal or click "Code" -> "Download ZIP" and extract it. Keep all extracted files together in the same folder so the application can locate the required scripts.
 
-2. **Run the Installer/Launcher:**
-   * Open your `meatsafe-matrix-manager` folder.
-   * Right-click `launch_matrix.command`, hold the `Option` key, and click **Open** (this bypasses the standard macOS unrecognized developer warning for the first run). 
-   * The script will automatically build a Python virtual environment, install the required dependencies (`requests`, `Pillow`), and launch the dashboard.
-   * *For all future uses, you can simply double-click `launch_matrix.command` to start the manager.*
-
-3. **Configure Draw Things:**
+2. **Configure Draw Things:**
    * Open Draw Things.
    * Go to **Settings** and check **Enable API Server** (HTTP, Port 7860).
+   
+3. **Run the Installer/Launcher:**
+   * Open your `meatsafe-matrix-manager` folder.
+   * Right-click `Meatsafe Matrix Manager`, and click **Open**.
+   * A macOS security prompt will appear warning you that the app is from an unverified developer. Click **Open** to confirm and bypass the block. (You only need to do this the first time).
+   * A Terminal window will launch automatically. On the very first run, the script will silently check for and install its required dependencies (`requests`, `Pillow`) before loading the main dashboard.
+   * For all future uses, you can simply double-click the `Meatsafe Matrix Manager` icon to start.
+
 
 ## Roadmap / Coming Soon
 This is v1.0. Future updates are planned to include:
@@ -54,7 +70,16 @@ Is my code saving hours of time and frustration for you? Consider tipping me a c
 ☕ [https://ko-fi.com/meatsafe](https://ko-fi.com/meatsafe)
 
 
-## Example Images
+## Screenshots
+
+![Screenshot](assets/screen1.png)  ![Screenshot](assets/screen2.png)
+![Screenshot](assets/screen3.png)
+![Screenshot](assets/screen4.png)
+![Screenshot](assets/screen5.png)
+![Screenshot](assets/screen6.png)
+
+
+## Example Matrices
 
 ![Example Matrix Output](assets/example1.png)
 ![Example Matrix Output](assets/example2.png)
