@@ -10,10 +10,18 @@ import textwrap
 import io
 import re
 import urllib.request
+import webbrowser
 from datetime import datetime
 
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-os.chdir(PROJECT_DIR)
+STATIC_DIR = os.path.dirname(os.path.realpath(__file__))
+INTERNAL_DIR = STATIC_DIR
+os.chdir(STATIC_DIR)
+
+APP_SUPPORT_DIR = os.path.expanduser("~/Library/Application Support/Meatsafe Matrix Manager")
+os.makedirs(APP_SUPPORT_DIR, exist_ok=True)
+
+CURRENT_VERSION = "v1.1"
+GITHUB_REPO = "MeatSafeMurdrer/meatsafe-matrix-manager"
 
 def install_dependencies(packages):
     for package in packages:
@@ -30,10 +38,54 @@ except ImportError:
     print("Required packages installed successfully. Please relaunch the script.")
     sys.exit(0)
 
-MODELS_FILE = "matrix_models.json"
-CONTROLS_FILE = "matrix_controls.json"
-EXPORT_SETTINGS_FILE = "matrix_export_settings.json"
-BACKUPS_FILE = "matrix_backups.json"
+def check_for_updates():
+    if not EXPORT_SETTINGS.get("check_for_updates", True):
+        return
+    try:
+        url = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
+        response = requests.get(url, timeout=2.5)
+        if response.status_code != 200:
+            return
+
+        latest_data = response.json()
+        latest_tag = latest_data.get("tag_name", "").strip()
+        release_url = latest_data.get("html_url", f"https://github.com/{GITHUB_REPO}/releases/latest")
+
+        if (
+            latest_tag
+            and latest_tag != CURRENT_VERSION
+            and latest_tag.lstrip("v") > CURRENT_VERSION.lstrip("v")
+        ):
+            print("\n" + "=" * 50)
+            print(f"✨ A new update is available: {latest_tag} (Current: {CURRENT_VERSION})")
+            print("=" * 50)
+            choice = input("Would you like to download the update now? [Y/n]: ").strip().lower()
+
+            if choice in ("", "y", "yes"):
+                print(f"\nOpening {release_url} in your default browser...")
+                webbrowser.open(release_url)
+                print("Download the new .dmg and drag the app to your Applications folder to replace this version.")
+                input("Press Enter to continue running the current version for now...\n")
+            else:
+                print("Skipping update for now.\n")
+    except Exception:
+        pass
+
+MODELS_FILE = os.path.join(APP_SUPPORT_DIR, "matrix_models.json")
+CONTROLS_FILE = os.path.join(APP_SUPPORT_DIR, "matrix_controls.json")
+EXPORT_SETTINGS_FILE = os.path.join(APP_SUPPORT_DIR, "matrix_export_settings.json")
+BACKUPS_FILE = os.path.join(APP_SUPPORT_DIR, "matrix_backups.json")
+
+# Seed Application Support config files from static bundle templates if not already present
+for _fname in ["matrix_models.json", "matrix_controls.json", "matrix_export_settings.json", "matrix_backups.json"]:
+    _src = os.path.join(STATIC_DIR, _fname)
+    _dst = os.path.join(APP_SUPPORT_DIR, _fname)
+    if os.path.exists(_src) and not os.path.exists(_dst) and _src != _dst:
+        try:
+            with open(_src, "r") as _sf, open(_dst, "w") as _df:
+                _df.write(_sf.read())
+        except Exception:
+            pass
 API_URL = "http://127.0.0.1:7860"
 
 # ANSI Color Codes
@@ -94,6 +146,7 @@ def get_backup_state(backup):
 
 def save_json(filepath, data):
     try:
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
         with open(filepath, "w") as f:
             json.dump(data, f, indent=4)
         return True
@@ -105,7 +158,9 @@ def save_json(filepath, data):
 DEFAULT_EXPORT_SETTINGS = {
     "save_individual_pngs": True,
     "save_grid_png": True,
-    "save_grid_html": True
+    "save_grid_html": True,
+    "output_directory": "~/Meatsafe Matrix Manager/",
+    "check_for_updates": True
 }
 EXPORT_SETTINGS = load_json(EXPORT_SETTINGS_FILE, DEFAULT_EXPORT_SETTINGS.copy())
 for _k, _v in DEFAULT_EXPORT_SETTINGS.items():
@@ -1292,7 +1347,8 @@ def build_api_payload(config, cell_loras):
 
 def run_matrix(BASE_CONFIG, X_AXIS, Y_AXIS):
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    OUTPUT_DIR = os.path.join("matrix_output", timestamp)
+    base_out = os.path.expanduser(EXPORT_SETTINGS.get("output_directory", "~/Meatsafe Matrix Manager/"))
+    OUTPUT_DIR = os.path.join(base_out, timestamp)
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
     print(f"\nWriting all outputs to: {OUTPUT_DIR}/")
@@ -1621,25 +1677,30 @@ def manage_parameter_backups():
             input(f"\n{YELLOW}Press Enter to continue...{RESET}")
 
 # =======================================================================
-# MANAGER: EXPORT SETTINGS
+# MANAGER: SETTINGS
 # =======================================================================
 
 def manage_export_settings():
     while True:
         clear_screen()
         print(f"{CYAN}=================================")
-        print("        EXPORT SETTINGS")
+        print("            SETTINGS")
         print(f"================================={RESET}")
         print()
         indiv_status = f"{GREEN}ENABLED{RESET}" if EXPORT_SETTINGS["save_individual_pngs"] else f"{RED}DISABLED{RESET}"
         grid_png_status = f"{GREEN}ENABLED{RESET}" if EXPORT_SETTINGS["save_grid_png"] else f"{RED}DISABLED{RESET}"
         grid_html_status = f"{GREEN}ENABLED{RESET}" if EXPORT_SETTINGS["save_grid_html"] else f"{RED}DISABLED{RESET}"
+        update_status = f"{GREEN}ENABLED{RESET}" if EXPORT_SETTINGS.get("check_for_updates", True) else f"{RED}DISABLED{RESET}"
+        
+        out_dir = EXPORT_SETTINGS.get("output_directory", "~/Meatsafe Matrix Manager/")
         
         print(f"1. Save Individual PNGs : [{indiv_status}]")
         print(f"2. Save Grid PNG        : [{grid_png_status}]")
         print(f"3. Save Grid HTML       : [{grid_html_status}]")
+        print(f"4. Output Directory     : [{out_dir}]")
+        print(f"5. Check for Updates    : [{update_status}]")
         print()
-        print("Enter [1-3] to toggle, or [B] to go back to Main Menu.")
+        print("Enter [1-5] to toggle or edit, or [B] to go back to Main Menu.")
         print()
         choice = input(f"{YELLOW}Select an option: {RESET}").strip().lower()
         if choice == 'b':
@@ -1662,8 +1723,19 @@ def manage_export_settings():
                 print(f"\n{YELLOW}ℹ️  Note: Automatically enabled 'Save Individual PNGs' because local images are required for the HTML to render.{RESET}")
                 input(f"\n{YELLOW}Press Enter to continue...{RESET}")
             save_json(EXPORT_SETTINGS_FILE, EXPORT_SETTINGS)
+        elif choice == '4':
+            cur = EXPORT_SETTINGS.get("output_directory", "~/Meatsafe Matrix Manager/")
+            new_path = input(f"\n{YELLOW}Enter new output directory (current: {cur}): {RESET}").strip()
+            if new_path:
+                EXPORT_SETTINGS["output_directory"] = new_path
+                save_json(EXPORT_SETTINGS_FILE, EXPORT_SETTINGS)
+                print(f"\n{GREEN}✅ Output directory updated to: {new_path}{RESET}")
+                input(f"\n{YELLOW}Press Enter to continue...{RESET}")
+        elif choice == '5':
+            EXPORT_SETTINGS["check_for_updates"] = not EXPORT_SETTINGS.get("check_for_updates", True)
+            save_json(EXPORT_SETTINGS_FILE, EXPORT_SETTINGS)
         else:
-            print(f"\n{RED}Invalid choice, please select 1, 2, 3, or B.{RESET}")
+            print(f"\n{RED}Invalid choice, please select 1, 2, 3, 4, 5, or B.{RESET}")
             input(f"\n{YELLOW}Press Enter to continue...{RESET}")
 
 # =======================================================================
@@ -1671,6 +1743,7 @@ def manage_export_settings():
 # =======================================================================
 
 def main():
+    check_for_updates()
     if not os.path.exists(MODELS_FILE):
         clear_screen()
         print(f"{YELLOW}Welcome! No models found in {MODELS_FILE}.{RESET}")
@@ -1681,7 +1754,7 @@ def main():
     while True:
         clear_screen()
         print(f"{CYAN}=================================")
-        print("  Meatsafe's Matrix Manager v1.0")
+        print(f"  Meatsafe's Matrix Manager {CURRENT_VERSION}")
         print(f"================================={RESET}")
         print()
         
@@ -1691,10 +1764,10 @@ def main():
         print("2. Manage Base Models")
         if has_backups:
             print("3. Parameter Backups")
-            print("4. Export Settings")
+            print("4. Settings")
             print("5. Exit")
         else:
-            print("3. Export Settings")
+            print("3. Settings")
             print("4. Exit")
         print()
         choice = input(f"{YELLOW}Select an option: {RESET}").strip().lower()

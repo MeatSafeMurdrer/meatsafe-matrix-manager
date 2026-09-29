@@ -41,23 +41,23 @@ This script utilizes the Draw Things Local HTTP API to generate X/Y comparison m
 
 ## Installation
 
-1. **Download the Repository:**
-   * Download the .zip file from `Releases` and extract it. Keep all extracted files together in the same folder so the application can locate the required scripts.
+1. **Download the Installer:**
+   * Ensure your settings allow applications from unverified developers.
+   * Download the .DMG file from `Releases` and install the app.
 
 2. **Configure Draw Things:**
    * Open Draw Things.
    * Go to **Settings** and check **Enable API Server** (HTTP, Port 7860).
    
-3. **Run the Installer/Launcher:**
-   * Open your extracted `meatsafe-matrix-manager` folder.
-   * Right-click `Meatsafe Matrix Manager.app`, and click **Open**.
-   * A macOS security prompt will appear warning you that the app is from an unverified developer. Click **Open** to confirm and bypass the block. (You only need to do this the first time).
-   * A Terminal window will launch automatically. On the very first run, the script will silently check for and install its required dependencies (`requests`, `Pillow`) before loading the main dashboard.
-   * For all future uses, you can simply double-click the `Meatsafe Matrix Manager` icon to start.
+3. **Run the App:**
+   * Open `Meatsafe Matrix Manager`.
+   * A macOS security prompt will may appear warning you that the app is from an unverified developer. Click **Open** to confirm and bypass the block. (You only need to do this the first time).
+   * A Terminal window will launch automatically.
+   * No command line expertise is required, it will walk you through all the steps and settings.
 
 
 ## Roadmap / Coming Soon
-This is v1.0. Future updates are planned to include:
+This is v1.1. Future updates are planned to include:
 * Varied LoRA strength testing.
 * Full ControlNet profile integration.
 * Additional axis variables, including Seed and Sampler comparisons.
