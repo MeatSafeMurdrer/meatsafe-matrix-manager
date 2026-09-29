@@ -42,15 +42,14 @@ This script utilizes the Draw Things Local HTTP API to generate X/Y comparison m
 ## Installation
 
 1. **Download the Repository:**
-   * Clone this repository via terminal or click "Code" -> "Download ZIP" and extract it. Keep all extracted files together in the same folder so the application can locate the required scripts.
+   * Download the .zip file from `Releases` and extract it. Keep all extracted files together in the same folder so the application can locate the required scripts.
 
 2. **Configure Draw Things:**
    * Open Draw Things.
    * Go to **Settings** and check **Enable API Server** (HTTP, Port 7860).
    
 3. **Run the Installer/Launcher:**
-   * Open your `meatsafe-matrix-manager` folder.
-   * Double-click `Meatsafe Matrix Manager.zip` to unpack `Meatsafe Matrix Manager.app`
+   * Open your extracted `meatsafe-matrix-manager` folder.
    * Right-click `Meatsafe Matrix Manager.app`, and click **Open**.
    * A macOS security prompt will appear warning you that the app is from an unverified developer. Click **Open** to confirm and bypass the block. (You only need to do this the first time).
    * A Terminal window will launch automatically. On the very first run, the script will silently check for and install its required dependencies (`requests`, `Pillow`) before loading the main dashboard.
